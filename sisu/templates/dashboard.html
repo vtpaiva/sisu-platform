@@ -1,0 +1,601 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard Sisu</title>
+  <style>
+    /* Estilos Gerais */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+    :root {
+      --primary-color: #007bff;
+      --secondary-color: #6f42c1;
+      --accent-color: #28a745;
+      --bg-light: #f8f9fa;
+      --bg-medium: #e9ecef;
+      --text-dark: #333;
+      --text-light: #fff;
+      --border-color: #dee2e6;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-medium);
+      color: var(--text-dark);
+      line-height: 1.6;
+    }
+
+    .page-wrapper {
+      padding: 30px 15px;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background-color: var(--text-light);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Cabeçalho */
+    .header {
+      background-color: var(--primary-color);
+      color: var(--text-light);
+      padding: 25px;
+      text-align: center;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 2.2em;
+      font-weight: 700;
+    }
+
+    /* Botões de Navegação Externa (na página principal) */
+    .external-nav-buttons-container {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        padding: 20px 0;
+        background-color: var(--bg-light);
+        border-bottom: 1px solid var(--border-color);
+        flex-wrap: wrap; /* Permite que os botões quebrem a linha em telas menores */
+    }
+
+    .external-nav-button {
+        padding: 10px 25px;
+        background-color: var(--accent-color);
+        color: var(--text-light);
+        text-decoration: none;
+        border-radius: 6px;
+        font-size: 1.1em;
+        font-weight: 600;
+        display: inline-block;
+        transition: background-color 0.2s ease, transform 0.1s ease;
+        min-width: 180px; /* Garante um tamanho mínimo para os botões */
+        text-align: center;
+    }
+
+    .external-nav-button:hover {
+        background-color: #218838;
+        transform: translateY(-2px);
+    }
+    .external-nav-button:active {
+        transform: translateY(0);
+    }
+
+
+    /* Navegação das Abas (dentro do dashboard) */
+    .tabs-nav {
+      background-color: var(--bg-light);
+      display: flex;
+      justify-content: center;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .tab-button {
+      background-color: transparent;
+      border: none;
+      padding: 15px 25px;
+      font-size: 1.1em;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--text-dark);
+      transition: all 0.3s ease;
+      border-bottom: 3px solid transparent;
+    }
+
+    .tab-button:hover {
+      background-color: #e2e6ea;
+    }
+
+    .tab-button.active {
+      color: var(--primary-color);
+      border-bottom-color: var(--primary-color);
+      background-color: #f0f2f5;
+    }
+
+    /* Conteúdo das Abas */
+    .tab-content {
+      padding: 30px;
+    }
+
+    .tab-pane {
+      display: none;
+    }
+
+    .tab-pane.active {
+      display: block;
+    }
+
+    /* Seções de Conteúdo */
+    .section-title {
+      color: var(--secondary-color);
+      font-size: 1.8em;
+      margin-bottom: 25px;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    /* Formulário */
+    .form-section label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #555;
+    }
+
+    textarea, input:not([type="submit"]), select {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 20px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 1em;
+      background-color: #fff;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+      transition: border-color 0.2s;
+    }
+
+    textarea:focus, input:focus, select:focus {
+      border-color: var(--primary-color);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+    }
+
+    button[type="submit"], .action-button {
+      background-color: var(--secondary-color);
+      color: var(--text-light);
+      padding: 12px 25px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1.1em;
+      font-weight: 600;
+      transition: background-color 0.2s ease, transform 0.1s ease;
+    }
+
+    button[type="submit"]:hover, .action-button:hover {
+      background-color: #5936a1;
+      transform: translateY(-2px);
+    }
+
+    button[type="submit"]:active, .action-button:active {
+        transform: translateY(0);
+    }
+
+    .messages-container {
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .messages-container .success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 10px;
+    }
+
+    .messages-container .error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 10px;
+    }
+
+
+    /* Lista de Notas */
+    .notas-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .nota-item {
+      background: white;
+      border-left: 6px solid var(--primary-color);
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      transition: transform 0.2s ease;
+    }
+
+    .nota-item:hover {
+      transform: translateY(-5px);
+    }
+
+    .nota-scores strong {
+      display: inline-block;
+      min-width: 90px;
+      color: #555;
+    }
+
+    .nota-meta {
+      font-size: 0.88em;
+      color: #666;
+      margin-top: 10px;
+      border-top: 1px solid #eee;
+      padding-top: 10px;
+    }
+
+    /* Gráficos Plotly */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+      gap: 30px;
+      margin-top: 30px;
+    }
+
+    .chart-card {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  padding: 20px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden; /* importante pra segurar o gráfico */
+}
+
+.plotly-graph-div {
+  width: 100% !important;
+  height: 350px !important;
+  max-width: 100% !important;
+  box-sizing: border-box;
+  overflow: hidden !important;
+}
+
+    .plotly-graph-div {
+    max-width: 100% !important;
+    width: 100% !important;
+    height: 350px !important;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+
+    /* Simulação Preditiva */
+    .prediction-section {
+      text-align: center; /* Mantido para texto */
+      display: flex; /* Habilita Flexbox */
+      flex-direction: column; /* Coloca os itens em coluna */
+      align-items: center; /* Centraliza itens horizontalmente */
+      justify-content: flex-start; /* Alinha itens ao topo verticalmente */
+    }
+
+    .loading-animation {
+      display: none;
+      margin-top: 20px; /* Ajusta a margem superior para espaçamento */
+      /* Removido margin: auto; */
+      border: 6px solid #f3f3f3;
+      border-top: 6px solid var(--accent-color);
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .prediction-table-container {
+      display: none;
+      margin-top: 30px;
+      overflow-x: auto;
+      width: 100%;
+    }
+
+    .prediction-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .prediction-table th, .prediction-table td {
+      border: 1px solid var(--border-color);
+      padding: 12px 15px;
+      text-align: left;
+    }
+
+    .prediction-table th {
+      background-color: var(--primary-color);
+      color: var(--text-light);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.9em;
+    }
+
+    .prediction-table tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    .prediction-table tr:hover {
+      background-color: #e9e9e9;
+    }
+
+    /* Responsividade */
+    @media (max-width: 768px) {
+      .tabs-nav {
+        flex-direction: column;
+      }
+      .tab-button {
+        width: 100%;
+        border-bottom: none;
+        border-right: 3px solid transparent;
+      }
+      .tab-button.active {
+        border-bottom-color: transparent;
+        border-right-color: var(--primary-color);
+      }
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+      .external-nav-buttons-container {
+        flex-direction: column;
+        gap: 10px;
+      }
+      .external-nav-button {
+        width: 100%;
+        max-width: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrapper">
+    <div class="container">
+        <div class="header" style="background-color: transparent; padding: 0;">
+          <div style="background-color: white; padding: 20px 30px; border-radius: 12px 12px 0 0; box-shadow: 0 4px 20px rgba(0,0,0,0.1); border: 3px solid #007bff; display: flex; align-items: center; justify-content: center; gap: 20px;">
+            <img src="https://portal.ifba.edu.br/santo-amaro/sisu/2024.1/logo_sisu_2024.png/@@images/ba595b62-fe88-4ba2-b11c-133ef1454839.png" alt="Logo Sisu" style="height: 60px;">
+            <h1 style="margin: 0; color: #007bff; font-size: 2.2em;">Dashboard Sisu Analytics</h1>
+          </div>
+        </div>
+      
+      <div class="tabs-nav">
+        <button class="tab-button active" data-tab="tab1">Adicionar Nota</button>
+        <button class="tab-button" data-tab="tab2">Gráficos e Medidas</button>
+        <button class="tab-button" data-tab="tab3">Simulação Preditiva</button>
+      </div>
+
+      <div class="tab-content">
+        <div id="tab1" class="tab-pane active">
+          <h2 class="section-title">Adicionar Nova Nota</h2>
+          <div class="messages-container">
+              {% if messages %}
+                  <ul class="messages">
+                      {% for message in messages %}
+                          <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                      {% endfor %}
+                  </ul>
+              {% endif %}
+          </div>
+          <form id="notaForm" method="post" action="{% url 'dashboard' %}">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div style="width: 100%; display: flex; justify-content: center; margin-top: 20px;">
+              <button type="submit">Salvar Nota</button>
+            </div>
+          </form>
+
+          <ul class="notas-list" id="notasList">
+            <div style="text-align: center; font-size: 1.2em; font-weight: 600; color: var(--secondary-color); padding: 20px;">
+              {% if object_list %}
+                Total de notas cadastradas: {{ object_list|length }}
+              {% else %}
+                Nenhuma nota ainda. Adicione uma acima!
+              {% endif %}
+            </div>
+          </ul>
+        </div>
+
+        <div id="tab2" class="tab-pane">
+          <h2 class="section-title">Gráficos e Medidas das Notas</h2>
+          {% if no_data_for_charts %}
+            <p style="text-align: center; color: #dc3545; font-size: 1.1em; padding: 20px; border: 1px dashed #dc3545; border-radius: 8px;">
+              Não há notas cadastradas para gerar os gráficos. Por favor, adicione algumas notas na aba "Adicionar Nota".
+            </p>
+          {% else %}
+            <div class="charts-grid">
+              <div class="chart-card">
+                <h3>Média e Mediana por Área de Conhecimento</h3>
+                {{ plot_div_medias|safe }}
+              </div>
+              <div class="chart-card">
+                <h3>Distribuição das Médias Gerais</h3>
+                {{ plot_div_dist|safe }}
+              </div>
+              <div class="chart-card">
+                <h3>Top 5 Modalidades de Concorrência</h3>
+                {{ plot_div_top_modalidades_pie|safe }}
+              </div>
+               <div class="chart-card">
+                <h3>Variâncias das Notas por Área</h3> 
+                {{ plot_div_variancias|safe }}
+              </div>
+            </div>
+          {% endif %}
+        </div>
+
+        <div id="tab3" class="tab-pane">
+          <div class="prediction-section">
+            <h2 class="section-title">Simulação de Previsão de Notas para Próximo Ano</h2>
+            <p>Esta seção simula a previsão de notas de corte para cursos, com base nas notas registradas.</p>
+            <button id="generateTableBtn" class="action-button">Gerar Tabela de Previsão</button>
+            <div class="loading-animation" id="loadingAnimation"></div>
+            <div class="prediction-table-container" id="predictionTableContainer">
+              <table class="prediction-table">
+                <thead>
+                  <tr>
+                    <th>Curso</th>
+                    <th>Universidade</th>
+                    <th>Campus</th>
+                    <th>Estado</th>
+                    <th>Nota Prevista</th>
+                  </tr>
+                </thead>
+                <tbody id="predictionTableBody">
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Função para obter o token CSRF (necessário para o AJAX da simulação)
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.startsWith(name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+
+    // --- Script para Abas ---
+    document.addEventListener('DOMContentLoaded', () => {
+      const tabButtons = document.querySelectorAll('.tab-button');
+      const tabPanes = document.querySelectorAll('.tab-pane');
+
+      function showTab(tabId) {
+        tabPanes.forEach(pane => {
+          pane.classList.remove('active');
+        });
+        document.getElementById(tabId).classList.add('active');
+
+        tabButtons.forEach(button => {
+          button.classList.remove('active');
+        });
+        document.querySelector(`.tab-button[data-tab="${tabId}"]`).classList.add('active');
+
+        // Note: Plotly renderiza gráficos diretamente, sem necessidade de chamar initializeCharts() aqui.
+        // O JS que Plotly gera é auto-executável quando o HTML é carregado.
+        // Apenas o Chart.js precisava de uma chamada explícita para renderizar no showTab.
+      }
+
+      // Lógica para ativar a aba com base no query parameter da URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const tabFromUrl = urlParams.get('tab');
+
+      if (tabFromUrl) {
+          showTab(tabFromUrl);
+      } else {
+          showTab('tab1'); // Padrão se nenhum parâmetro de aba for fornecido
+      }
+
+      tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          showTab(button.dataset.tab);
+        });
+      });
+
+    });
+
+    // --- Script para Simulação Preditiva (Aba 3) ---
+    const generateTableBtn = document.getElementById('generateTableBtn');
+    const loadingAnimation = document.getElementById('loadingAnimation');
+    const predictionTableContainer = document.getElementById('predictionTableContainer');
+    const predictionTableBody = document.getElementById('predictionTableBody');
+
+    generateTableBtn.addEventListener('click', async () => {
+        // Oculta o botão e a tabela, mostra a animação
+        generateTableBtn.style.display = 'none';
+        predictionTableContainer.style.display = 'none';
+        loadingAnimation.style.display = 'block';
+
+        try {
+            const response = await fetch("{% url 'prever_notas_api' %}", {
+                method: 'GET',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                },
+            });
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+
+            predictionTableBody.innerHTML = '';
+
+            data.previsoes.forEach(previsao => {
+                const row = `
+                    <tr>
+                        <td>${previsao.curso}</td>
+                        <td>${previsao.universidade}</td>
+                        <td>${previsao.campus}</td>
+                        <td>${previsao.estado}</td>
+                        <td>${previsao.nota_prevista}</td>
+                    </tr>
+                `;
+                predictionTableBody.innerHTML += row;
+            });
+
+            // Mostra a tabela
+            predictionTableContainer.style.display = 'block';
+
+        } catch (error) {
+            console.error("Erro ao gerar tabela de previsão:", error);
+            predictionTableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: red;">Erro ao carregar previsões.</td></tr>';
+            predictionTableContainer.style.display = 'block';
+        } finally {
+            // Oculta a animação e mostra o botão
+            loadingAnimation.style.display = 'none';
+            generateTableBtn.style.display = 'block';
+        }
+    });
+  </script>
+</body>
+</html>
